@@ -1,0 +1,9 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        edu.wpi.first GradleRIOPlugin.repo
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'SwerveDriveOnly'
