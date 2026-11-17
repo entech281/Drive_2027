@@ -2,12 +2,24 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DrivetrainInputs;
 
 /** Swerve-drive-only robot: the only actuator subsystem is the drivetrain. */
+@Logged(strategy = Logged.Strategy.OPT_IN)
 public class Robot extends TimedRobot {
+  @Logged
   private final Drivetrain drivetrain = new Drivetrain();
+  private final DrivetrainInputs drivetrainInputs = new DrivetrainInputs();
   private final XboxController driver = new XboxController(Constants.OI.DRIVER_USB_PORT);
+
+  public Robot() {
+    DataLogManager.start();
+    Epilogue.bind(this);
+  }
 
   @Override
   public void robotPeriodic() {
@@ -22,10 +34,11 @@ public class Robot extends TimedRobot {
 
     // Standard FRC convention: left stick translates, right stick turns.
     // Xbox Y axes are positive upward; negate them so forward is +X.
-    double forward = -applyDeadband(driver.getLeftY());
-    double left = -applyDeadband(driver.getLeftX());
-    double turn = -applyDeadband(driver.getRightX());
-    drivetrain.drive(forward, left, turn, !driver.getRightBumper());
+    drivetrainInputs.forward = -applyDeadband(driver.getLeftY());
+    drivetrainInputs.left = -applyDeadband(driver.getLeftX());
+    drivetrainInputs.turn = -applyDeadband(driver.getRightX());
+    drivetrainInputs.fieldRelative = !driver.getRightBumper();
+    drivetrain.drive(drivetrainInputs);
   }
 
   @Override
